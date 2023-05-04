@@ -11,15 +11,24 @@ namespace TeamProject
     {
         OK=0, //신청 성공
         AlreadyFull=1, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
-        Full=2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
+        OverCapacity=2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
         WrongCourseNumber=3 //잘못된 학정번호
     }
 
     public enum LoginResult
     {
         OK=0,
-        LoginFailed=1
+        WrongPassword=1,
+        NotYourDate=2,
+        ServerOff=3
     }
+
+    public enum FavoritesResult
+    {
+        OK=0,
+        AlreadyExist=1 //선택한 즐겨찾기 번호에 이미 다른과목이 있는 경우
+    }
+
     class Program
     {
         //데이터베이스 변수
@@ -136,9 +145,13 @@ namespace TeamProject
         }
 
         //즐겨찾기 필드 : 즐겨찾기에 추가 (DB 쓰기)
-        static void AddToFavorites(string stuID, string ci, short idx)
+        static FavoritesResult AddToFavorites(string stuID, string ci, short idx)
         {
-
+            if (true)
+            {
+                return FavoritesResult.OK;
+            }
+            else return FavoritesResult.AlreadyExist;
         }
 
         //즐겨찾기 필드 : 즐겨찾기에서 삭제 (DB 쓰기)
