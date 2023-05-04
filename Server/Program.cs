@@ -7,6 +7,19 @@ using MySql.Data.MySqlClient;
 
 namespace TeamProject
 {
+    public enum RegisterResult
+    {
+        OK=0, //신청 성공
+        AlreadyFull=1, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
+        Full=2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
+        WrongCourseNumber=3 //잘못된 학정번호
+    }
+
+    public enum LoginResult
+    {
+        OK=0,
+        LoginFailed=1
+    }
     class Program
     {
         //데이터베이스 변수
@@ -99,5 +112,49 @@ namespace TeamProject
             String rst = null;
             return rst;
         }
+
+        //서버 로그인 결과 (DB 읽기)
+        static LoginResult DBLogin(string stuID, string pwd)
+        {
+            if (true)
+            {
+                return LoginResult.OK;
+            }
+            else return LoginResult.LoginFailed;
+        }
+
+        //최초 로그인 시 즐겨찾기 목록 반환 (DB 읽기)
+        static object InquireFavorites(string stuID)
+        {
+
+        }
+
+        //최초 로그인 시 나의 현재 신청과목 반환 (DB 읽기)
+        static object GetMyRegisteredList(string stuID)
+        {
+
+        }
+
+        //즐겨찾기 필드 : 즐겨찾기에 추가 (DB 쓰기)
+        static void AddToFavorites(string stuID, string ci, short idx)
+        {
+
+        }
+
+        //즐겨찾기 필드 : 즐겨찾기에서 삭제 (DB 쓰기)
+        static void DeleteFromFavorites(string stuID, short idx)
+        {
+
+        }
+
+        //즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
+        static RegisterResult InquireCourse(string stuID, string ci) { }
+
+        //과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
+        static RegisterResult RegisterCourse(string stuID, string ci) { }
+
+        //검색 필드 : 과목검색 눌렀을때 (DB 읽기)
+        static void SearchCourse(string var) { }
+
     }
 }
