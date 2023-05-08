@@ -8,12 +8,26 @@ using System.Threading;
 namespace TeamProject
 {
     public enum RegisterResult
+    //외국인전용을 신청하지는 않는지 확인
+    //자신의 학점을 초과하지는 않는지 확인
+    //시간이 겹치는 지는 않는 지 확인
+    //동일한 과목을 추가하지는 않는 지 확인
+    //과목이 그 사이에 만석되지는 않았는 지 확인
     {
         OK = 0, //신청 성공
-        AlreadyFull = 1, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
-        OverCapacity = 2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
-        WrongCourseNumber = 3, //잘못된 학정번호
-        AlreadyRegistered = 4 // 이미 신청한 과목을 또 신청하려고 할 때
+        ForeignerOnly = 1, //내국인이 외국인 수강시도
+        ExceedsCredit = 2, //최대신청학점 초과
+        TimeConflicts = 3, //시간이 겹침
+        AlreadyRegistered = 4, // 이미 신청한 과목을 또 신청하려고 할 때
+        OverCapacity = 5, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
+    }
+
+    public enum InquireResult
+    {
+        OK = 0, //조회 성공
+        WrongCourseNumber = 1, //잘못된 학정번호
+        AlreadyTaken = 2, //이미 수강한 과목 신청시도(재수강불가)
+        AlreadyFull = 3, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
     }
 
     public enum LoginResult
@@ -207,9 +221,10 @@ namespace TeamProject
         }
 
         //즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
-        static RegisterResult InquireCourse(string stuID, string ci)
+        static object InquireCourse(string stuID, string ci)
         {
             string query = "";
+            //그런과목 있는지 확인
             //이전에 동일과목 수강했었는지 (과목명동일 or 동일교과목)
             query = $"SELECT * FROM sugang.`takes_info` " +
                 $"INNER JOIN sugang.`opened_course` ON opened_course.course_id = takes_info.course_id " +
@@ -229,6 +244,7 @@ namespace TeamProject
             //외국인전용을 신청하지는 않는지 확인
             //자신의 학점을 초과하지는 않는지 확인
             //시간이 겹치는 지는 않는 지 확인
+            //동일한 과목을 추가하지는 않는 지 확인
             //과목이 그 사이에 만석되지는 않았는 지 확인
             string asd = "";
             //수강목록에 추가 쿼리
