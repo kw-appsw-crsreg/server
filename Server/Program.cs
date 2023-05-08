@@ -1,33 +1,33 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using MySql.Data.MySqlClient;
 
 namespace TeamProject
 {
     public enum RegisterResult
     {
-        OK=0, //신청 성공
-        AlreadyFull=1, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
-        OverCapacity=2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
-        WrongCourseNumber=3, //잘못된 학정번호
-        AlreadyRegistered=4 // 이미 신청한 과목을 또 신청하려고 할 때
+        OK = 0, //신청 성공
+        AlreadyFull = 1, //과목조회 단계에서 만석 <- '만석입니다' 에 대응
+        OverCapacity = 2, //과목조회에는 성공했으나 신청을 누르기 전에 만석 <- '수강인원이 초과되어...' 에 대응
+        WrongCourseNumber = 3, //잘못된 학정번호
+        AlreadyRegistered = 4 // 이미 신청한 과목을 또 신청하려고 할 때
     }
 
     public enum LoginResult
     {
-        OK=0,
-        WrongPassword=1,
-        NotYourDate=2,
-        ServerOff=3
+        OK = 0,
+        WrongPassword = 1,
+        NotYourDate = 2,
+        ServerOff = 3
     }
 
     public enum FavoritesResult
     {
-        OK=0,
-        AlreadyExist=1 //선택한 즐겨찾기 번호에 이미 다른과목이 있는 경우
+        OK = 0,
+        AlreadyExist = 1 //선택한 즐겨찾기 번호에 이미 다른과목이 있는 경우
     }
 
     class Program
@@ -141,7 +141,7 @@ namespace TeamProject
                 }
                 rdr.Close();
 
-                
+
                 return LoginResult.OK;
             }
             catch { return LoginResult.WrongPassword; }
@@ -207,7 +207,8 @@ namespace TeamProject
         }
 
         //즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
-        static RegisterResult InquireCourse(string stuID, string ci) {
+        static RegisterResult InquireCourse(string stuID, string ci)
+        {
             string query = "";
             //이전에 동일과목 수강했었는지 (과목명동일 or 동일교과목)
             query = $"SELECT * FROM sugang.`takes_info` " +
@@ -223,7 +224,8 @@ namespace TeamProject
         }
 
         //과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
-        static RegisterResult RegisterCourse(string stuID, string ci) {
+        static RegisterResult RegisterCourse(string stuID, string ci)
+        {
             //외국인전용을 신청하지는 않는지 확인
             //자신의 학점을 초과하지는 않는지 확인
             //시간이 겹치는 지는 않는 지 확인
@@ -243,7 +245,8 @@ namespace TeamProject
         }
 
         //검색 필드 : 과목검색 눌렀을때 (DB 읽기)
-        static void SearchCourse(string var) {
+        static void SearchCourse(string var)
+        {
             string query = $"SELECT course_id, type, course_name, credit, instructor_name, maximum , time " +
                     $"FROM `opened_course` " +
                     $"WHERE department REGEXP '^' AND " +
