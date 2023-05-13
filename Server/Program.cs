@@ -10,7 +10,7 @@ using Server;
 
 namespace TeamProject
 {
-    class Server
+    class Program
     {
         //서버 변수
         private static Thread rcvThread;

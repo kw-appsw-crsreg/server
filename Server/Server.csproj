@@ -83,10 +83,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DBConnect.cs" />
     <Compile Include="Packet.cs" />
-    <Compile Include="Server.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryDao.cs" />
+    <Compile Include="QueryProcess.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
