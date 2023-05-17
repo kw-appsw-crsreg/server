@@ -9,7 +9,7 @@ using System.Data;
 
 namespace Server
 {
-    internal class QueryDao
+    internal class QueryProcess
     {
         static private MySqlConnection conn;
 
