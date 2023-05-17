@@ -25,7 +25,7 @@ namespace Server
         string dbPW;
         string dbConnStr;
         private MySqlConnection conn;
-        DBConnect(string uid, string pw)
+        public DBConnect(string uid, string pw)
         {
             this.dbUId = uid;
             this.dbPW = pw;
@@ -34,19 +34,11 @@ namespace Server
 
         public MySqlConnection Connect()
         {
-            try
-            {
                 conn = new MySqlConnection(dbConnStr);
                 Console.WriteLine("Connecting to MySQL...");
                 conn.Open();
                 Console.WriteLine("Connected to MySQL.");
                 return conn;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return null;
-            }
         }
     }
 }

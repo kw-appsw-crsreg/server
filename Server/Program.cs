@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using Server;
+using System.Diagnostics;
 
 namespace TeamProject
 {
@@ -18,12 +19,22 @@ namespace TeamProject
         public static NetworkStream stream;
         static byte[] readBuffer = new byte[1024 * 4];
         static byte[] sendBuffer = new byte[1024 * 4];
+
         static void Main(string[] args)
         {
             //TcpListener 생성 및 시작
             TcpListener server = null;
             IPAddress localAddr = IPAddress.Parse("127.0.0.1");
             int port = 12000;
+
+            //DB 연결
+            Console.Write("DB ID입력 >> ");
+            string dbID=Console.ReadLine();
+            Console.Write("DB PW입력 >> ");
+            string dbPW = Console.ReadLine();
+            DBConnect c=new DBConnect(dbID, dbPW);
+            try { MySqlConnection conn = c.Connect(); } catch(Exception e) { Console.Write("DB연결실패"); }
+
             try
             {
                 server = new TcpListener(localAddr, port);
