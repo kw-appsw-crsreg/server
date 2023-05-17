@@ -1,15 +1,13 @@
-﻿using MySql.Data.MySqlClient;
-using System.Runtime.Serialization.Formatters.Binary; 
+using MySql.Data.MySqlClient;
+using System.Runtime.Serialization.Formatters.Binary;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Runtime.CompilerServices;
-using Server;
 using System.Diagnostics;
 
-namespace TeamProject
+namespace Server
 {
     class Program
     {
@@ -19,7 +17,6 @@ namespace TeamProject
         public static NetworkStream stream;
         static byte[] readBuffer = new byte[1024 * 4];
         static byte[] sendBuffer = new byte[1024 * 4];
-
         static void Main(string[] args)
         {
             //TcpListener 생성 및 시작
@@ -29,12 +26,11 @@ namespace TeamProject
 
             //DB 연결
             Console.Write("DB ID입력 >> ");
-            string dbID=Console.ReadLine();
+            string dbID = Console.ReadLine();
             Console.Write("DB PW입력 >> ");
             string dbPW = Console.ReadLine();
-            DBConnect c=new DBConnect(dbID, dbPW);
-            try { MySqlConnection conn = c.Connect(); } catch(Exception e) { Console.Write("DB연결실패"); }
-
+            DBConnect c = new DBConnect(dbID, dbPW);
+            try { MySqlConnection conn = c.Connect(); } catch (Exception e) { Console.Write("DB연결실패"); }
             try
             {
                 server = new TcpListener(localAddr, port);
@@ -72,7 +68,7 @@ namespace TeamProject
             {
                 //Send to Client
                 stream = client.GetStream();
-                Initialize Init = new Initialize();
+                Initialize init;
                 int bs = 0;
 
                 while (true)
@@ -80,20 +76,18 @@ namespace TeamProject
                     bs = stream.Read(readBuffer, 0, 1024 * 4);
                     Packet packet = (Packet)Packet.Desserialize(readBuffer);
 
-                    // SQLrst(packet);
-                    // Init.Type = ;
-                    // Init.Data = ;
+                    init = (Initialize)SQLrst(packet);
 
-                    Packet.Serialize(Init).CopyTo(sendBuffer, 0);
+                    Packet.Serialize(init).CopyTo(sendBuffer, 0);
                     stream.Write(sendBuffer, 0, sendBuffer.Length);
                     stream.Flush();
 
-                    for(int i = 0; i < sendBuffer.Length; i++)
+                    for (int i = 0; i < sendBuffer.Length; i++)
                     {
                         sendBuffer[i] = 0;
                     }
                     stream.Flush();
-                 }
+                }
             }
             catch (Exception e)
             {
@@ -105,16 +99,105 @@ namespace TeamProject
             }
         }
 
-        static String SQLrst(Packet packet)
+        static Packet SQLrst(Packet packet)
         {
             switch ((int)packet.Type)
             {
-                case :
-                case :
-                case :
-                case :
+                case (int)Packet_Type.GoLogin:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((Login)packet).stuID);
+                        user.SetPwd(((Login)packet).pwd);
 
+                        init.Type = (int)QueryProcess.DBLogin(user); //
+                        return init;
+                    }
+                case (int)Packet_Type.GoRegister:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((Register)packet).stuID);
+                        user.SetCourseID(((Register)packet).ci);
+
+                        init.Type = (int)QueryProcess.RegisterCourse(user); //
+                        return init;
+                    }
+                case (int)Packet_Type.GoInquire:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((inquire)packet).stuID);
+                        user.SetCourseID(((inquire)packet).ci);
+
+                        init.Type = (int)QueryProcess.InquireCourse(user); //
+                        return init;
+                    }
+                case (int)Packet_Type.GetFavoirtes:
+                    {
+                        User user = new user();
+                        user.SetStuID(((Favorites)packet).stuID);
+
+                        return (Initialize)QueryProcess.InquireFavorites(user); //
+                    }
+                case (int)Packet_Type.AddToFavorites:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((Favorites)packet).stuID);
+                        user.SetCourseID(((Favorites)packet).ci);
+                        user.SetIdx(((Favorites)packet).idx);
+
+                        init.Type = (int)QueryProcess.AddToFavorites(user); //
+                        return init;
+                    }
+                case (int)Packet_Type.DeleteFromFavorites:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((Favorites)packet).stuID);
+                        user.SetIdx(((Favorites)packet).idx);
+
+                        init.Type = (int)QueryProcess.DeleteFromFavorites(user);
+                        return init;
+                    }
+                case (int)Packet_Type.GetRegisterCourses:
+                    {
+                        User user = new user();
+                        user.SetStuID(((Register)packet).stuID);
+
+                        return (Initialize)QueryProcess.GetMyRegisteredList(user); //
+                    }
+                case (int)Packet_Type.DropCourse:
+                    {
+                        Initialize init = new Initialize();
+                        User user = new user();
+                        user.SetStuID(((Register)packet).stuID);
+                        user.SetCourseID(((Register)packet).ci);
+
+                        init.Type = (int)QueryProcess.DropCourse(user); //
+                        return init;
+                    }
+                case (int)Packet_Type.SearchCouse:
+                    {
+                        User user = new user();
+                        user.SetVar(((Register)packet).var);
+
+                        return (Initialize)QueryProcess.SearchCourse(user);
+                    }
+                case (int)Packet_Type.GetTypes:
+                    {
+                        return (Initialize)QueryProcess.GetTypes(); //
+                    }
+                case (int)Packet_Type.GetDepartments:
+                    {
+                        User user = new user();
+                        user.SetStuID(((Initialize)packet).stuID);
+
+                        return (Initialize)QueryProcess.GetDepartments(user); //
+                    }
             }
+            return null;
         }
 
     }
