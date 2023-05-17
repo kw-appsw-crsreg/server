@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,8 +21,32 @@ namespace Server
         string dbServer = "127.0.0.1";
         string dbPortNum = "3306";
         string dbName = "Appsw2023DB";
-        string dbUId = "";
-        string dbPW = "";
-        //string dbConnStr = $"server={dbServer};user={dbUId};database={dbName};port={dbPortNum};password={dbPW}";
+        string dbUId ;
+        string dbPW;
+        string dbConnStr;
+        private MySqlConnection conn;
+        DBConnect(string uid, string pw)
+        {
+            this.dbUId = uid;
+            this.dbPW = pw;
+            dbConnStr = $"server={dbServer};user={dbUId};database={dbName};port={dbPortNum};password={dbPW}";
+        }
+
+        public MySqlConnection Connect()
+        {
+            try
+            {
+                conn = new MySqlConnection(dbConnStr);
+                Console.WriteLine("Connecting to MySQL...");
+                conn.Open();
+                Console.WriteLine("Connected to MySQL.");
+                return conn;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
     }
 }

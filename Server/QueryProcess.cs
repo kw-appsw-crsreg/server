@@ -138,11 +138,11 @@ namespace Server
                 int cnt = int.Parse(fav.ExecuteScalar().ToString());
                 Console.WriteLine(query);
                 Console.WriteLine(cnt);
-                if (cnt != 0) return false;
+                if (cnt != 0) return FavoritesResult.AlreadyExist;
             }
             catch
             {
-                return FavoritesResult.AlreadyExist; ;
+                return FavoritesResult.AlreadyExist;
             }
 
             //즐겨찾기에 최종 추가
@@ -152,7 +152,7 @@ namespace Server
                     $"VALUES ('{stuID}', {idx}, {ci})";
                 fav = new MySqlCommand(query, conn);
                 fav.ExecuteNonQuery();
-                return true;
+                return FavoritesResult.OK;
             }
             catch { return FavoritesResult.AlreadyExist; }
         }
@@ -239,7 +239,7 @@ namespace Server
                 query = $"INSERT INTO `sugang`.`takes_info` (`student_id`, `course_id`) VALUES ('{stuID}', '{ci}')";
                 reg = new MySqlCommand(query, conn);
                 reg.ExecuteNonQuery();
-                return true;
+                return RegisterResult.OK;
             }
             finally
             {
