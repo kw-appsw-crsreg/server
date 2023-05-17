@@ -241,7 +241,7 @@ namespace Server
                 reg.ExecuteNonQuery();
                 return RegisterResult.OK;
             }
-            finally
+            catch
             {
 
             }
