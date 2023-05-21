@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    internal interface User
+    internal interface IUser
     {
         void SetStuID(string stuID);
         void SetPwd(String pwd);
@@ -24,7 +24,7 @@ namespace Server
     }
 
 
-    public class user : User
+    public class user : IUser
     {
         String stuid;
         String pwd;

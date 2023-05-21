@@ -15,7 +15,7 @@ namespace Server
         static private MySqlConnection conn;
 
         // TESTED : 서버 로그인 결과 (DB 읽기)
-        public static LoginResult DBLogin(User user)
+        public static LoginResult DBLogin(IUser user)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 즐겨찾기 목록 반환 (DB 읽기)
-        public static Packet InquireFavorites(User user)
+        public static Packet InquireFavorites(IUser user)
         {
             string query = $"SELECT opened_course.course_id, course_name, credit, instructor_name, time" +
                $" FROM `opened_course` INNER JOIN `registerd_favorites`" +
@@ -75,7 +75,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 나의 현재 신청과목 반환 (DB 읽기)
-        public static Packet GetMyRegisteredList(User user)
+        public static Packet GetMyRegisteredList(IUser user)
         {
             //현재학기 수강신청정보와 개설과목 정보를 JOIN
             //학정번호,이수구분,과목명,학점,교수명,시간,강의실 반환
@@ -144,7 +144,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 학생의 소속학과 반환 : TESTED
-        public static Packet GetDepartments(User user)
+        public static Packet GetDepartments(IUser user)
         {
             string query = $"SELECT department_str FROM `student_info` WHERE `student_id`={user.GetStuID()}";
             Initialize init = new Initialize();
@@ -174,7 +174,7 @@ namespace Server
         }
 
         // TESTED : 즐겨찾기 필드 : 즐겨찾기에 추가 (DB 쓰기)
-        public static FavoritesResult AddToFavorites(User user)
+        public static FavoritesResult AddToFavorites(IUser user)
         {
             MySqlCommand fav;
             string query = $"";
@@ -207,7 +207,7 @@ namespace Server
         }
 
         // TESTED : 즐겨찾기 필드 : 즐겨찾기에서 삭제 (DB 쓰기)
-        public static FavoritesResult DeleteFromFavorites(User user)
+        public static FavoritesResult DeleteFromFavorites(IUser user)
         {
             MySqlCommand fav;
             string query = $"";
@@ -226,7 +226,7 @@ namespace Server
         }
 
         //일부  TESTED : 즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
-        public static object InquireCourse(User user)
+        public static object InquireCourse(IUser user)
         {
             string query = "";
             MySqlDataAdapter adpt;
@@ -272,7 +272,7 @@ namespace Server
         }
 
         //일부 TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
-        public static RegisterResult RegisterCourse(User user)
+        public static RegisterResult RegisterCourse(IUser user)
         {
             //외국인전용을 신청하지는 않는지 확인
             //자신의 학점을 초과하지는 않는지 확인
@@ -298,7 +298,7 @@ namespace Server
         }
 
         // TESTED : 과목선택 필드 : 수강신청 삭제할때 (DB 쓰기)
-        public static First_ProcessResult DropCourse(User user)
+        public static First_ProcessResult DropCourse(IUser user)
         {
             //수강삭제 쿼리
             string query = $"DELETE FROM `sugang`.`takes_info` WHERE  `student_id`='{user.GetStuID()}' AND `course_id`='{user.GetCourseID()}' ";
@@ -317,7 +317,7 @@ namespace Server
         }
 
         //검색 필드 : 과목검색 눌렀을때 (DB 읽기)
-        public static Packet SearchCourse(User user)
+        public static Packet SearchCourse(IUser user)
         {
             string query = $"SELECT course_id, type, course_name, credit, instructor_name, maximum , time " +
                  $"FROM `opened_course` " +

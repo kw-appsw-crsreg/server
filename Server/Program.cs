@@ -106,7 +106,7 @@ namespace Server
                 case (int)Packet_Type.GoLogin:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Login)packet).stuID);
                         user.SetPwd(((Login)packet).pwd);
 
@@ -116,7 +116,7 @@ namespace Server
                 case (int)Packet_Type.GoRegister:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Register)packet).stuID);
                         user.SetCourseID(((Register)packet).ci);
 
@@ -126,7 +126,7 @@ namespace Server
                 case (int)Packet_Type.GoInquire:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((inquire)packet).stuID);
                         user.SetCourseID(((inquire)packet).ci);
 
@@ -135,7 +135,7 @@ namespace Server
                     }
                 case (int)Packet_Type.GetFavoirtes:
                     {
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Favorites)packet).stuID);
 
                         return (Initialize)QueryProcess.InquireFavorites(user); //
@@ -143,7 +143,7 @@ namespace Server
                 case (int)Packet_Type.AddToFavorites:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Favorites)packet).stuID);
                         user.SetCourseID(((Favorites)packet).ci);
                         user.SetIdx(((Favorites)packet).idx);
@@ -154,7 +154,7 @@ namespace Server
                 case (int)Packet_Type.DeleteFromFavorites:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Favorites)packet).stuID);
                         user.SetIdx(((Favorites)packet).idx);
 
@@ -163,7 +163,7 @@ namespace Server
                     }
                 case (int)Packet_Type.GetRegisterCourses:
                     {
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Register)packet).stuID);
 
                         return (Initialize)QueryProcess.GetMyRegisteredList(user); //
@@ -171,7 +171,7 @@ namespace Server
                 case (int)Packet_Type.DropCourse:
                     {
                         Initialize init = new Initialize();
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Register)packet).stuID);
                         user.SetCourseID(((Register)packet).ci);
 
@@ -180,7 +180,7 @@ namespace Server
                     }
                 case (int)Packet_Type.SearchCouse:
                     {
-                        User user = new user();
+                        IUser user = new user();
                         user.SetVar(((Register)packet).var);
 
                         return (Initialize)QueryProcess.SearchCourse(user);
@@ -191,7 +191,7 @@ namespace Server
                     }
                 case (int)Packet_Type.GetDepartments:
                     {
-                        User user = new user();
+                        IUser user = new user();
                         user.SetStuID(((Initialize)packet).stuID);
 
                         return (Initialize)QueryProcess.GetDepartments(user); //
