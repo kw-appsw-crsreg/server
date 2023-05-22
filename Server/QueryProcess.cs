@@ -15,6 +15,7 @@ namespace Server
         static private MySqlConnection conn;
 
         // TESTED : 서버 로그인 결과 (DB 읽기)
+        // 학번, 비번
         public static LoginResult DBLogin(IUser user)
         {
             try
@@ -38,6 +39,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 즐겨찾기 목록 반환 (DB 읽기)
+        // 학번
         public static Packet InquireFavorites(IUser user)
         {
             string query = $"SELECT opened_course.course_id, course_name, credit, instructor_name, time" +
@@ -75,6 +77,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 나의 현재 신청과목 반환 (DB 읽기)
+        // 학번
         public static Packet GetMyRegisteredList(IUser user)
         {
             //현재학기 수강신청정보와 개설과목 정보를 JOIN
@@ -144,6 +147,7 @@ namespace Server
         }
 
         // TESTED : 최초 로그인 시 학생의 소속학과 반환 : TESTED
+        // 학번
         public static Packet GetDepartments(IUser user)
         {
             string query = $"SELECT department_str FROM `student_info` WHERE `student_id`={user.GetStuID()}";
@@ -174,6 +178,7 @@ namespace Server
         }
 
         // TESTED : 즐겨찾기 필드 : 즐겨찾기에 추가 (DB 쓰기)
+        // 학번, 인덱스, 학정번호
         public static FavoritesResult AddToFavorites(IUser user)
         {
             MySqlCommand fav;
@@ -207,6 +212,7 @@ namespace Server
         }
 
         // TESTED : 즐겨찾기 필드 : 즐겨찾기에서 삭제 (DB 쓰기)
+        // 학번, 인덱스
         public static FavoritesResult DeleteFromFavorites(IUser user)
         {
             MySqlCommand fav;
@@ -226,6 +232,7 @@ namespace Server
         }
 
         //일부  TESTED : 즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
+        // 학번, 학정번호
         public static object InquireCourse(IUser user)
         {
             string query = "";
@@ -272,6 +279,7 @@ namespace Server
         }
 
         //일부 TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
+        // 학번, 학정번호
         public static RegisterResult RegisterCourse(IUser user)
         {
             //외국인전용을 신청하지는 않는지 확인
@@ -298,6 +306,7 @@ namespace Server
         }
 
         // TESTED : 과목선택 필드 : 수강신청 삭제할때 (DB 쓰기)
+        // 학번, 학정번호
         public static First_ProcessResult DropCourse(IUser user)
         {
             //수강삭제 쿼리
@@ -316,15 +325,22 @@ namespace Server
             return First_ProcessResult.OK;
         }
 
-        //검색 필드 : 과목검색 눌렀을때 (DB 읽기)
+        // TESTED : 검색 필드 : 과목검색 눌렀을때 (DB 읽기)
         public static Packet SearchCourse(IUser user)
         {
-            string query = $"SELECT course_id, type, course_name, credit, instructor_name, maximum , time " +
+            string department = ""; //전체검색이라면 비워두세요
+            string courseType = ""; //전체검색이라면 비워두세요
+            string courseName = ""; //전체검색이라면 비워두세요
+            bool isOnlyRemaining = false;
+
+            //반환항목 : 학정번호,개설구분,과목명,학점,교수명,여석,개설시간
+            string query = $"SELECT course_id, type, course_name, credit, instructor_name, remaining_capacity , time " +
                  $"FROM `opened_course` " +
-                 $"WHERE department REGEXP '^' AND " +
-                 $"WHERE type='전선' AND " +
-                 $"WHERE AND" +
-                 $"WHERE course_name REGEXP '*{user.GetVar()}*' AND ";
+                 $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030
+
+            if (true) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
+            if (true) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
+            if (isOnlyRemaining) { query = query + " AND remaining_capacity>0 "; } //여석유무에따라
 
             Initialize init = new Initialize();
             DataSet searchResult = new DataSet();

@@ -32,3 +32,8 @@ C:\Users\박규태\Source\Repos\server\Server\bin\Debug\System.Threading.Tasks.E
 C:\Users\박규태\Source\Repos\server\Server\obj\Debug\Server.csproj.CopyComplete
 C:\Users\박규태\Source\Repos\server\Server\obj\Debug\Server.exe
 C:\Users\박규태\Source\Repos\server\Server\obj\Debug\Server.pdb
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.csproj.AssemblyReference.cache
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.csproj.SuggestedBindingRedirects.cache
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.csproj.CoreCompileInputs.cache
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.exe
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.pdb
