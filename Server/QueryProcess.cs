@@ -233,7 +233,7 @@ namespace Server
 
         //일부  TESTED : 즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
         // 학번, 학정번호
-        public static object InquireCourse(IUser user)
+        public static InquireResult InquireCourse(IUser user)
         {
             string query = "";
             MySqlDataAdapter adpt;
@@ -246,7 +246,7 @@ namespace Server
 
             //만석여부 판단 -> 만석이면 False
             DataRow dataRow = ds.Tables["course_info"].Rows[0];
-            if (int.Parse(dataRow["remaining_capacity"].ToString()) == 0) return false;
+            if (int.Parse(dataRow["remaining_capacity"].ToString()) == 0) return InquireResult.AlreadyFull ;
 
             string courseName = dataRow["course_name"].ToString();
             string subjectID = dataRow["subject"].ToString();
@@ -265,8 +265,8 @@ namespace Server
 
             //재수강가능인지 확인
             dataRow = ds.Tables["before_taken"].Rows[0];
-            if (int.Parse(dataRow["gpa"].ToString()) >= 3) return false; // 이전에 B이상이면 재수강불가
-            if (ds.Tables["before_taken"].Rows.Count >= 3) return false; //재수강은 학칙상 2번만 가능 : 최초+1번째+2번째
+            if (int.Parse(dataRow["gpa"].ToString()) >= 3) return InquireResult.AlreadyTaken; // 이전에 B이상이면 재수강불가
+            if (ds.Tables["before_taken"].Rows.Count >= 3) return InquireResult.AlreadyTaken; //재수강은 학칙상 2번만 가능 : 최초+1번째+2번째
 
             string beforeYear = dataRow["year"].ToString();
             string beforeSemester = dataRow["semester"].ToString();
@@ -275,7 +275,7 @@ namespace Server
             string beforeCredit = dataRow["credit"].ToString(); ;
             string beforeCourseName = dataRow["course_name"].ToString();
 
-            return RegisterResult.OK;
+            return InquireResult.OK;
         }
 
         //일부 TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
