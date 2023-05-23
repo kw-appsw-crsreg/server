@@ -283,10 +283,23 @@ namespace Server
         public static RegisterResult RegisterCourse(IUser user)
         {
             //외국인전용을 신청하지는 않는지 확인
-            //자신의 학점을 초과하지는 않는지 확인
-            //시간이 겹치는 지는 않는 지 확인
-            //과목이 그 사이에 만석되지는 않았는 지 확인
-            string query = "";
+            //학생의 외국인여부 조회
+            string query = $" SELECT is_foreigner FROM student_info WHERE student_id={user.GetStuID()} ";
+            MySqlCommand fori = new MySqlCommand(query, conn);
+            bool isStudentForeigner = bool.Parse(fori.ExecuteScalar().ToString());
+
+            //과목의 외국인전용여부 조회
+            query = $"SELECT is_foreignerOnly FROM opened_course WHERE course_id={user.GetCourseID()} ";
+            fori = new MySqlCommand(query, conn);
+            bool isCourseForeigner = bool.Parse(fori.ExecuteScalar().ToString());
+
+            //비교
+            if (isStudentForeigner == false && isCourseForeigner == true)
+                return RegisterResult.ForeignerOnly;
+            //////////////////////////////////////////////////
+
+
+            //시간이 겹치진 않는 지 확인
             MySqlCommand reg;
 
             //즐겨찾기에 최종 추가
@@ -298,9 +311,20 @@ namespace Server
                 reg.ExecuteNonQuery();
                 return RegisterResult.OK;
             }
-            catch
+            catch (MySqlException e)
             {
-
+                switch (e.Number)
+                {
+                    case 1690:
+                        Console.WriteLine("1690 인원초과!");
+                        return RegisterResult.OverCapacity;
+                        break;
+                    case 4025:
+                        Console.WriteLine("4025 최대학점초과!");
+                        return RegisterResult.ExceedsCredit;
+                        break;
+                }
+                Console.WriteLine(e.Number.ToString());
             }
             return RegisterResult.OK;
         }
