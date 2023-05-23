@@ -6,24 +6,25 @@ using System.Threading.Tasks;
 
 namespace Server
 {
+    // 메소드간 필요한 자료형을 매개변수 주입으로 주고 받을 때 사용될 인터페이스
     internal interface IUser
     {
-        void SetStuID(string stuID);
-        void SetPwd(String pwd);
-        void SetCourseID(String ci);
-        void SetIdx(short idx);
-        void SetVar(String var);
+        void SetStuID(string stuID); // 인터페이스를 통해 인자로 전달 할 학생ID를 인터페이스를 구현한 클래스의 변수에 저장합니다.
+        void SetPwd(String pwd); // 인터페이스를 통해 인자로 전달 할 학생 비밀번호를 인터페이스를 구현한 클래스의 변수에 저장합니다.
+        void SetCourseID(String ci); // 인터페이스를 통해 인자로 전달 할 Course ID를 인터페이스를 구현한 클래스의 변수에 저장합니다.
+        void SetIdx(short idx); // 인터페이스를 통해 인자로 전달 할 즐겨찾기를 추가하는 동작을 하는 AddToFavorites() 메소드에 쓰이는 인덱스를 인터페이스를 구현한 클래스의 변수에 저장합니다.
+        void SetVar(String var); // 인터페이스를 통해 인자로 전달 할 과목 명칭을 인터페이스를 구현한 클래스의 변수에 저장합니다.
 
 
-        String GetStuID();
-        String GetPwd();
-        String GetCourseID();
-        short GetIdx();
-        String GetVar();
+        String GetStuID(); // 저장된 학생 ID를 반환합니다.
+        String GetPwd(); // 저장된 학생 비밀번호를 반환합니다.
+        String GetCourseID(); // 저장된 Course ID를 반환합니다.
+        short GetIdx(); // 저장된 인덱스를 반환합니다.
+        String GetVar(); // 저장된 과목 명칭를 반환합니다.
 
     }
 
-
+    // 위의 인터페이스가 구현된 클래스
     public class user : IUser
     {
         String stuid;

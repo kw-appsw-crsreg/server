@@ -136,7 +136,7 @@ namespace Server
                 case (int)Packet_Type.GetFavoirtes:
                     {
                         IUser user = new user();
-                        user.SetStuID(((Favorites)packet).stuID);
+                        user.SetStuID(((inquire)packet).stuID);
 
                         return (Initialize)QueryProcess.InquireFavorites(user); //
                     }
