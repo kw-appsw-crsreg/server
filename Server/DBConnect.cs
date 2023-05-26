@@ -20,7 +20,7 @@ namespace Server
          */
         string dbServer = "127.0.0.1";
         string dbPortNum = "3306";
-        string dbName = "Appsw2023DB";
+        string dbName = "sugang";
         string dbUId ;
         string dbPW;
         string dbConnStr;
@@ -35,9 +35,9 @@ namespace Server
         public MySqlConnection Connect()
         {
                 conn = new MySqlConnection(dbConnStr);
-                Console.WriteLine("Connecting to MySQL...");
+                Console.WriteLine("DB연결중...");
                 conn.Open();
-                Console.WriteLine("Connected to MySQL.");
+                Console.WriteLine("DB연결성공!!");
                 return conn;
         }
     }

@@ -30,7 +30,8 @@ namespace Server
             Console.Write("DB PW입력 >> ");
             string dbPW = Console.ReadLine();
             DBConnect c = new DBConnect(dbID, dbPW);
-            try { MySqlConnection conn = c.Connect(); } catch (Exception e) { Console.Write("DB연결실패"); }
+            try { MySqlConnection conn = c.Connect(); } catch (Exception e) { Console.WriteLine("DB연결실패"); Environment.Exit(-1); }
+
             try
             {
                 server = new TcpListener(localAddr, port);
