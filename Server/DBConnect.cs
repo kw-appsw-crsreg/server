@@ -24,7 +24,7 @@ namespace Server
         string dbUId ;
         string dbPW;
         string dbConnStr;
-        private MySqlConnection conn;
+        public MySqlConnection conn;
         public DBConnect(string uid, string pw)
         {
             this.dbUId = uid;
@@ -39,6 +39,11 @@ namespace Server
                 conn.Open();
                 Console.WriteLine("DB연결성공!!");
                 return conn;
+        }
+
+        public MySqlConnection GetConnection()
+        {
+            return conn;
         }
     }
 }

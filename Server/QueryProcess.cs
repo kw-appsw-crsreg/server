@@ -10,29 +10,20 @@ using System.Management;
 
 namespace Server
 {
-    internal class QueryProcess
+    internal static class QueryProcess
     {
-        static private MySqlConnection conn;
+        static public MySqlConnection conn;
 
         // TESTED : 서버 로그인 결과 (DB 읽기)
         // 학번, 비번
         public static LoginResult DBLogin(IUser user)
         {
-            try
+           try
             {
-                string query = $"SELECT * FROM `student_info` WHERE `student_id`={user.GetStuID()} AND password={user.GetPwd()}";
+                string query = $"SELECT * FROM `student_info` WHERE `student_id`='{user.GetStuID()}' AND password='{user.GetPwd()}' ;";
+                Console.WriteLine(query);
                 MySqlCommand login = new MySqlCommand(query, conn);
                 MySqlDataReader rdr = login.ExecuteReader();
-                // ExecuteReader to query the database.
-                // ExecuteNonQuery to insert, update, and delete data.
-
-                while (rdr.Read())
-                {
-                    Console.WriteLine($"ID: {rdr[0]}, Name: {rdr[1]}, Age: {rdr[2]}");
-                }
-                rdr.Close();
-
-
                 return LoginResult.OK;
             }
             catch { return LoginResult.WrongPassword; }

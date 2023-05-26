@@ -6,6 +6,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Diagnostics;
+using Org.BouncyCastle.Bcpg.OpenPgp;
+using System.Security.Cryptography;
+using MySqlX.XDevAPI.Common;
+using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace Server
 {
@@ -30,7 +35,32 @@ namespace Server
             Console.Write("DB PW입력 >> ");
             string dbPW = Console.ReadLine();
             DBConnect c = new DBConnect(dbID, dbPW);
-            try { MySqlConnection conn = c.Connect(); } catch (Exception e) { Console.WriteLine("DB연결실패"); Environment.Exit(-1); }
+            try { QueryProcess.conn = c.Connect(); } catch (Exception e) { Console.WriteLine("DB연결실패"); Environment.Exit(-1); }
+
+            //테스트용
+            bool doTest = true;
+            while (doTest)
+            {
+                Console.Write("사용자 ID입력 >> ");
+                string studentID = Console.ReadLine();
+                Console.Write("사용자 PW입력 >> ");
+                string studentPWPlain = Console.ReadLine();
+
+                //From String to byte array
+                SHA1 sha = SHA1.Create();
+                byte[] sourceBytes = Encoding.UTF8.GetBytes(studentPWPlain);
+                byte[] hashBytes = sha.ComputeHash(sourceBytes);
+                string studentPWHash = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
+
+                Console.WriteLine(studentPWHash);
+
+                user tst = new user();
+                tst.SetStuID(studentID); tst.SetPwd(studentPWHash);
+
+                if (QueryProcess.DBLogin(tst) == LoginResult.OK)
+                    Console.WriteLine("성공");
+                else { Console.WriteLine("없음"); }
+            }
 
             try
             {
