@@ -124,7 +124,7 @@ namespace Server
 
         static void SenderThread(Object packet)
         {
-            // //Send to Client
+            //Send to Client
             Initialize init;
             init = (Initialize)SQLrst((Packet)packet);
 
