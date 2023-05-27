@@ -83,12 +83,10 @@ namespace Server
     [Serializable]
     public class Packet
     {
-        public int Length;
         public int Type;
 
         public Packet()
         {
-            this.Length = 0;
             this.Type = 0;
         }
 
@@ -122,7 +120,7 @@ namespace Server
     public class Initialize : Packet
     {
         public string stuID;
-        public DataSet ds;
+        public String ds;
     }
 
     [Serializable]
@@ -130,7 +128,7 @@ namespace Server
     {
         public string stuID;
         public string pwd;
-        public DataSet ds;
+        public String ds;
     }
 
     [Serializable]
@@ -139,7 +137,7 @@ namespace Server
         public string stuID;
         public string ci;
         public string var;
-        public DataSet ds;
+        public String ds;
     }
 
     [Serializable]
@@ -147,7 +145,7 @@ namespace Server
     {
         public string stuID;
         public string ci;
-        public DataSet ds;
+        public String ds;
     }
 
     [Serializable]
@@ -156,7 +154,7 @@ namespace Server
         public string stuID;
         public string ci;
         public short idx;
-        public DataSet ds;
+        public String ds;
     }
 
     // Serializationexception : Cant find Assembly 해결용

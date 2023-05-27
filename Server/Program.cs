@@ -97,27 +97,19 @@ namespace Server
         {
             try
             {
-                //Send to Client
+                //Receive From Client
                 stream = client.GetStream();
-                Initialize init;
+                Packet packet;
+                Thread sndThread;
                 int bs = 0;
 
                 while (true)
                 {
                     bs = stream.Read(readBuffer, 0, 1024 * 4);
-                    Packet packet = (Packet)Packet.Desserialize(readBuffer);
+                    packet = (Packet)Packet.Desserialize(readBuffer);
 
-                    init = (Initialize)SQLrst(packet);
-
-                    Packet.Serialize(init).CopyTo(sendBuffer, 0);
-                    stream.Write(sendBuffer, 0, sendBuffer.Length);
-                    stream.Flush();
-
-                    for (int i = 0; i < sendBuffer.Length; i++)
-                    {
-                        sendBuffer[i] = 0;
-                    }
-                    stream.Flush();
+                    sndThread = new Thread(new ParameterizedThreadStart(SenderThread));
+                    sndThread.Start(packet);
                 }
             }
             catch (Exception e)
@@ -128,6 +120,23 @@ namespace Server
             {
                 Console.WriteLine("연결중 문제가 발생했습니다");
             }
+        }
+
+        static void SenderThread(Object packet)
+        {
+            // //Send to Client
+            Initialize init;
+            init = (Initialize)SQLrst((Packet)packet);
+
+            Packet.Serialize(init).CopyTo(sendBuffer, 0);
+            stream.Write(sendBuffer, 0, sendBuffer.Length);
+            stream.Flush();
+
+            for (int i = 0; i < sendBuffer.Length; i++)
+            {
+                sendBuffer[i] = 0;
+            }
+            stream.Flush();
         }
 
         static Packet SQLrst(Packet packet)

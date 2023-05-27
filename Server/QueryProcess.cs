@@ -46,7 +46,7 @@ namespace Server
             try
             {
                 adpt.Fill(ds);
-                init.ds = ds;
+                init.ds = DatasetToJson.SerializeToJSON(ds);
                 init.Type = (int)FavoritesResult.OK;
             }
             catch
@@ -88,7 +88,7 @@ namespace Server
             try
             {
                 adpt.Fill(ds);
-                init.ds = ds;
+                init.ds = DatasetToJson.SerializeToJSON(ds);
                 init.Type = (int)RegisterResult.OK;
             }
             catch
@@ -119,7 +119,7 @@ namespace Server
             try
             {
                 adpt.Fill(ds);
-                init.ds = ds;
+                init.ds = DatasetToJson.SerializeToJSON(ds);
                 init.Type = (int)First_ProcessResult.OK;
             }
             catch
@@ -150,7 +150,7 @@ namespace Server
             try
             {
                 adpt.Fill(ds);
-                init.ds = ds;
+                init.ds = DatasetToJson.SerializeToJSON(ds);
                 init.Type = (int)First_ProcessResult.OK;
             }
             catch
@@ -365,7 +365,7 @@ namespace Server
             try
             {
                 adpt.Fill(searchResult);
-                init.ds = searchResult;
+                init.ds = DatasetToJson.SerializeToJSON(searchResult);
                 init.Type = (int)First_ProcessResult.OK;
             }
             catch
