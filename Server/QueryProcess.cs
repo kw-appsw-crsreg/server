@@ -360,7 +360,7 @@ namespace Server
         public static First_ProcessResult DropCourse(IUser user)
         {
             //수강삭제 쿼리
-            string query = $"DELETE FROM `sugang`.`takes_info` WHERE  `student_id`='{user.GetStuID()}' AND `course_id`='{user.GetCourseID()}' ";
+            string query = $"DELETE FROM `sugang`.`takes_info` WHERE  `student_id`='{user.GetStuID()}' AND `course_id`='{user.GetCourseID()}'; ";
             MySqlCommand fav;
             try
             {
@@ -372,6 +372,7 @@ namespace Server
             {
                 return First_ProcessResult.Error;
             }
+            Console.WriteLine ("삭제성공");
             return First_ProcessResult.OK;
         }
 
