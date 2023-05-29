@@ -1,6 +1,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Server
 {
@@ -278,20 +279,24 @@ namespace Server
             return InquireResult.OK;
         }
 
-        //일부 TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
+        // TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)
         // 학번, 학정번호
         public static RegisterResult RegisterCourse(IUser user)
         {
-            //외국인전용을 신청하지는 않는지 확인
-            //학생의 외국인여부 조회
-            string query = $" SELECT is_foreigner FROM student_info WHERE student_id={user.GetStuID()} ";
-            MySqlCommand fori = new MySqlCommand(query, conn);
-            bool isStudentForeigner = bool.Parse(fori.ExecuteScalar().ToString());
+            DataSet ds = new DataSet();
 
-            //과목의 외국인전용여부 조회
-            query = $"SELECT is_foreignerOnly FROM opened_course WHERE course_id={user.GetCourseID()} ";
-            fori = new MySqlCommand(query, conn);
-            bool isCourseForeigner = bool.Parse(fori.ExecuteScalar().ToString());
+            //외국인전용을 신청하지는 않는지 확인
+            //학생정보 가져오기
+            string query = $" SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}' ";
+            MySqlDataAdapter fori = new MySqlDataAdapter(query, conn);
+            fori.Fill(ds, "student_info");
+            bool isStudentForeigner = bool.Parse(ds.Tables["student_info"].Rows[0]["is_foreigner"].ToString());
+
+            //과목정보 가져오기
+            query = $"SELECT is_foreignerOnly, `time` FROM opened_course WHERE course_id='{user.GetCourseID()}' ";
+            fori = new MySqlDataAdapter(query, conn);
+            fori.Fill(ds, "course_info");
+            bool isCourseForeigner = bool.Parse(ds.Tables["course_info"].Rows[0]["is_foreignerOnly"].ToString());
 
             //비교
             if (isStudentForeigner == false && isCourseForeigner == true)
@@ -299,19 +304,39 @@ namespace Server
                 Console.WriteLine("내국인은 외국인전용 신청불가");
                 return RegisterResult.ForeignerOnly;
             }
-            //////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////
 
 
             //시간이 겹치진 않는 지 확인
-            MySqlCommand reg;
+            string studentTime= ds.Tables["student_info"].Rows[0]["registered_times"].ToString();
+            string courseTime = ds.Tables["course_info"].Rows[0]["time"].ToString();
 
-            //즐겨찾기에 최종 추가
+            Console.WriteLine("학생시간 >> "+studentTime);
+            Console.WriteLine("과목시간 >> " + courseTime);
+
+            string[] courseTimeS = courseTime.Split('.'); // . 으로 Slicing하여 저장
+
+            // Regex regex = new Regex(@"^[월화수목금토일]");
+            foreach (string str in courseTimeS)
+            {
+                if (str == "미지정") break;
+                if (str == "") continue;
+                if (studentTime.Contains(str)==true)
+                {
+                    Console.WriteLine("시간이 겹칩니다.");
+                    return RegisterResult.TimeConflicts;
+                }
+            }
+
+            //수강신청에 최종 추가
             try
             {
-                //수강목록에 추가 쿼리
-                query = $"INSERT INTO `sugang`.`takes_info` (`student_id`, `course_id`) VALUES ('{user.GetStuID()}', '{user.GetCourseID()}')";
-                reg = new MySqlCommand(query, conn);
-                reg.ExecuteNonQuery();
+                //수강목록에 추가 쿼리문
+                query = $"INSERT INTO `sugang`.`takes_info` (`student_id`, `course_id`) VALUES ('{user.GetStuID()}', '{user.GetCourseID()}') ;";
+                //시간업데이트는 DB레벨에서 해줄거임
+                MySqlCommand timeCheck = new MySqlCommand(query, conn);
+                timeCheck.ExecuteNonQuery();
+                Console.WriteLine("신청성고!!!!");
                 return RegisterResult.OK;
             }
             catch (MySqlException e)
@@ -321,11 +346,9 @@ namespace Server
                     case 1690:
                         Console.WriteLine("1690 인원초과!");
                         return RegisterResult.OverCapacity;
-                        break;
                     case 4025:
                         Console.WriteLine("4025 최대학점초과!");
                         return RegisterResult.ExceedsCredit;
-                        break;
                 }
                 Console.WriteLine(e.Number.ToString());
             }
