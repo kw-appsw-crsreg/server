@@ -284,8 +284,6 @@ namespace Server
         public static RegisterResult RegisterCourse(IUser user)
         {
             DataSet ds = new DataSet();
-
-            //외국인전용을 신청하지는 않는지 확인
             //학생정보 가져오기
             string query = $" SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}' ";
             MySqlDataAdapter fori = new MySqlDataAdapter(query, conn);
@@ -298,7 +296,7 @@ namespace Server
             fori.Fill(ds, "course_info");
             bool isCourseForeigner = bool.Parse(ds.Tables["course_info"].Rows[0]["is_foreignerOnly"].ToString());
 
-            //비교
+            //내국인이 외국인전용을 신청하지는 않는지 확인
             if (isStudentForeigner == false && isCourseForeigner == true)
             {
                 Console.WriteLine("내국인은 외국인전용 신청불가");
@@ -307,16 +305,16 @@ namespace Server
             ////////////////////////////////////////////////////////////////////////////////////////
 
 
-            //시간이 겹치진 않는 지 확인
+            //지금 신청하려는 과목이 학생의 다른 신청과목과 겹치지는 않는지 확인
             string studentTime= ds.Tables["student_info"].Rows[0]["registered_times"].ToString();
             string courseTime = ds.Tables["course_info"].Rows[0]["time"].ToString();
 
             Console.WriteLine("학생시간 >> "+studentTime);
             Console.WriteLine("과목시간 >> " + courseTime);
 
-            string[] courseTimeS = courseTime.Split('.'); // . 으로 Slicing하여 저장
+            string[] courseTimeS = courseTime.Split('.'); // . 으로 신청하려는 과목의 시간들을 Slicing하여 저장
 
-            // Regex regex = new Regex(@"^[월화수목금토일]");
+            //현재 신청하려는 과목의 시간대에 다른 기신청 과목이 있는지 확인
             foreach (string str in courseTimeS)
             {
                 if (str == "미지정") break;
@@ -328,23 +326,23 @@ namespace Server
                 }
             }
 
-            //수강신청에 최종 추가
+            //모든 검증을 완료했다면, 수강목록에 추가
+            //학생의 수강목록에도 현재 과목을 추가하는건 DB레벨에서 알아서 해줌(트리거)
             try
             {
                 //수강목록에 추가 쿼리문
                 query = $"INSERT INTO `sugang`.`takes_info` (`student_id`, `course_id`) VALUES ('{user.GetStuID()}', '{user.GetCourseID()}') ;";
-                //시간업데이트는 DB레벨에서 해줄거임
                 MySqlCommand timeCheck = new MySqlCommand(query, conn);
                 timeCheck.ExecuteNonQuery();
-                Console.WriteLine("신청성고!!!!");
+                Console.WriteLine("신청성공!!!!");
                 return RegisterResult.OK;
             }
-            catch (MySqlException e)
+            catch (MySqlException e) //인원초과, 신청가능 최대학점 초과 확인도 DB에서 알아서 해줌(제약조건, 트리거)
             {
                 switch (e.Number)
                 {
                     case 1690:
-                        Console.WriteLine("1690 인원초과!");
+                        Console.WriteLine("1690 인원이 초과되어 신청불가!");
                         return RegisterResult.OverCapacity;
                     case 4025:
                         Console.WriteLine("4025 최대학점초과!");
