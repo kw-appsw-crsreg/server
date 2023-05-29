@@ -43,11 +43,20 @@ namespace Server
             {
                 Console.Write("사용자 ID입력 >> ");
                 string studentID = Console.ReadLine();
-                Console.Write("사용자 PW입력 >> ");
-                string studentPWPlain = Console.ReadLine();
+                Console.Write("대상학정번호 >> ");
+                string stuCourseNum = Console.ReadLine();
+
+                if(studentID=="x") doTest = false;
+
+                user tst = new user();
+                tst.SetStuID(studentID); tst.SetCourseID(stuCourseNum);
+
+                QueryProcess.InquireCourse(tst);
+
 
                 //From String to byte array
-                SHA1 sha = SHA1.Create();
+                /*
+                 * SHA1 sha = SHA1.Create();
                 byte[] sourceBytes = Encoding.UTF8.GetBytes(studentPWPlain);
                 byte[] hashBytes = sha.ComputeHash(sourceBytes);
                 string studentPWHash = BitConverter.ToString(hashBytes).Replace("-", String.Empty);
@@ -60,6 +69,7 @@ namespace Server
                 if (QueryProcess.DBLogin(tst) == LoginResult.OK)
                     Console.WriteLine("성공");
                 else { Console.WriteLine("없음"); }
+                 */
             }
 
             try
