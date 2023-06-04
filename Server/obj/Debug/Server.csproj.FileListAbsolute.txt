@@ -68,3 +68,4 @@ C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Numer
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.csproj.CopyComplete
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\AppswPacket.dll

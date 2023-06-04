@@ -18,9 +18,14 @@ namespace Server
             {
                 string query = $"SELECT * FROM `student_info` WHERE `student_id`='{user.GetStuID()}' AND password='{user.GetPwd()}' ;";
                 Console.WriteLine(query);
-                MySqlCommand login = new MySqlCommand(query, conn);
-                MySqlDataReader rdr = login.ExecuteReader();
-                return LoginResult.OK;
+
+                MySqlDataAdapter l = new MySqlDataAdapter(query, conn);
+                DataSet ds=new DataSet();
+
+                try {l.Fill(ds, "student"); } catch { Console.WriteLine("Error!"); }
+                if ( ds.Tables["student"].Rows.Count < 1)
+                    return LoginResult.WrongPassword;
+                else return LoginResult.OK;
             }
             catch { return LoginResult.WrongPassword; }
         }
