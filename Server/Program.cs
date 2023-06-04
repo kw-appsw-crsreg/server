@@ -1,16 +1,7 @@
-using MySql.Data.MySqlClient;
-using System.Runtime.Serialization.Formatters.Binary;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Diagnostics;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using System.Security.Cryptography;
-using MySqlX.XDevAPI.Common;
-using System.Text;
-using System.Runtime.CompilerServices;
 
 namespace Server
 {
@@ -38,21 +29,18 @@ namespace Server
             try { QueryProcess.conn = c.Connect(); } catch (Exception e) { Console.WriteLine("DB연결실패"); Environment.Exit(-1); }
 
             //테스트용
-            bool doTest = true;
-            while (doTest)
+            while (false)
             {
                 Console.Write("사용자 ID입력 >> ");
                 string studentID = Console.ReadLine();
+
                 Console.Write("대상학정번호 >> ");
                 string stuCourseNum = Console.ReadLine();
-
-                if(studentID=="x") doTest = false;
 
                 user tst = new user();
                 tst.SetStuID(studentID); tst.SetCourseID(stuCourseNum);
 
-                QueryProcess.InquireCourse(tst);
-
+                QueryProcess.DropCourse(tst);
 
                 //From String to byte array
                 /*
