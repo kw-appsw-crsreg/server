@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -12,8 +13,7 @@ namespace Server
         private static Thread rcvThread;
         private static TcpClient client;
         public static NetworkStream stream;
-        static byte[] readBuffer = new byte[1024 * 4];
-        static byte[] sendBuffer = new byte[1024 * 4];
+        static HashSet<Packet> set = new HashSet<Packet>();
         static void Main(string[] args)
         {
             //TcpListener 생성 및 시작
@@ -66,30 +66,31 @@ namespace Server
                 server = new TcpListener(localAddr, port);
                 server.Start();
                 DateTime t = DateTime.Now; //시간 표시용
-
                 //Listening Loop
                 while (true)
                 {
-                    Console.WriteLine("Waiting for next Connection...");
-                    client = server.AcceptTcpClient();
-                    t = DateTime.Now;
-                    string currentTime = t.ToString();
-                    Console.WriteLine(currentTime + " Connected!");
+                    try
+                    {
+                        Console.WriteLine("Waiting for next Connection...");
+                        client = server.AcceptTcpClient();
+                        t = DateTime.Now;
+                        string currentTime = t.ToString();
+                        Console.WriteLine(currentTime + " Connected!");
 
-                    //Thread 시작(Receive from Client)
-                    rcvThread = new Thread(new ThreadStart(ReceiverThread));
-                    rcvThread.Start();
+                        //Thread 시작(Receive from Client)
+                        rcvThread = new Thread(new ThreadStart(ReceiverThread));
+                        rcvThread.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("One Connection lost!!");
+                    }
                 }
             }
             catch (SocketException e)
             {
                 Console.WriteLine("SocketException : {0}", e);
             }
-            finally
-            {
-                server.Stop();
-            }
-            Console.WriteLine("\n 서버가 종료됩니다");
         }
 
         static void ReceiverThread()
@@ -104,11 +105,17 @@ namespace Server
 
                 while (true)
                 {
+                    byte[] readBuffer = new byte[1024 * 4];
                     bs = stream.Read(readBuffer, 0, 1024 * 4);
                     packet = (Packet)Packet.Desserialize(readBuffer);
+                    stream.Flush();
 
-                    sndThread = new Thread(new ParameterizedThreadStart(SenderThread));
-                    sndThread.Start(packet);
+                    if (!set.Contains(packet))
+                    {
+                        set.Add(packet);
+                        sndThread = new Thread(new ParameterizedThreadStart(SenderThread));
+                        sndThread.Start(packet);
+                    }
                 }
             }
             catch (Exception e)
@@ -123,19 +130,23 @@ namespace Server
 
         static void SenderThread(Object packet)
         {
-            //Send to Client
-            Initialize init;
-            init = (Initialize)SQLrst((Packet)packet);
+           
+                //Send to Client
+                Initialize init;
+                byte[] sendBuffer = new byte[1024 * 4];
+                init = (Initialize)SQLrst((Packet)packet);
 
-            Packet.Serialize(init).CopyTo(sendBuffer, 0);
-            stream.Write(sendBuffer, 0, sendBuffer.Length);
-            stream.Flush();
+                Packet.Serialize(init).CopyTo(sendBuffer, 0);
+                stream.Write(sendBuffer, 0, sendBuffer.Length);
+                stream.Flush();
 
-            for (int i = 0; i < sendBuffer.Length; i++)
-            {
-                sendBuffer[i] = 0;
-            }
-            stream.Flush();
+                for (int i = 0; i < sendBuffer.Length; i++)
+                {
+                    sendBuffer[i] = 0;
+                }
+                stream.Flush();
+                set.Remove((Packet)packet);
+            
         }
 
         static Packet SQLrst(Packet packet)
