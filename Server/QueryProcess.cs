@@ -1,9 +1,8 @@
 //using MySql.Data.MySqlClient;
+using AppswPacket;
 using MySqlConnector;
 using System;
 using System.Data;
-using System.Text.RegularExpressions;
-using AppswPacket;
 
 namespace Server
 {
@@ -13,29 +12,75 @@ namespace Server
 
         // TESTED : 서버 로그인 결과 (DB 읽기)
         // 학번, 비번
-        public static LoginResult DBLogin(IUser user)
+        // GetMyRegisteredList + InquireFavorites + GetDepartments합친기능!!
+        public static Packet DBLogin(IUser user)
         {
-            try
+            Initialize init = new Initialize();
+            DataSet ds = new DataSet();
+            string query = "";
+
+            try//GetDepartments의 기능 통합됨 -> department_str
             {
-                string query = $"SELECT * FROM `student_info` WHERE `student_id`='{user.GetStuID()}' AND password='{user.GetPwd()}' ;";
+                query = $"SELECT department_str, `name` FROM `student_info` WHERE `student_id`='{user.GetStuID()}' AND password='{user.GetPwd()}' ;";
                 Console.WriteLine(query);
 
                 MySqlDataAdapter l = new MySqlDataAdapter(query, conn);
-                DataSet ds=new DataSet();
 
-                try {l.Fill(ds, "student"); } catch { Console.WriteLine("Error!"); }
-                if ( ds.Tables["student"].Rows.Count < 1)
-                    return LoginResult.WrongPassword;
-                else return LoginResult.OK;
+                try { l.Fill(ds, "student_info"); } catch { Console.WriteLine("Error!"); }
+                if (ds.Tables["student_info"].Rows.Count < 1)
+                    init.Type = (int)LoginResult.WrongPassword;
+                else init.Type = (int)LoginResult.OK;
             }
-            catch { return LoginResult.WrongPassword; }
+            catch { init.Type = (int)LoginResult.WrongPassword; }
+
+            //로그인결과 맞다면 즐겨찾기목록, 현재신청과목, 소속학과도 같이 넣어반환
+            //아니라면 LoginResult만 반환
+            if (init.Type == (int)LoginResult.OK)
+            {
+                //InquireFavorites에서의 기능
+                query = $"SELECT idx, opened_course.course_id, course_name, credit, instructor_name, `time`" +
+               $" FROM `opened_course` INNER JOIN `registerd_favorites`" +
+               $" ON registerd_favorites.course_id = opened_course.course_id" +
+               $" WHERE student_id={user.GetStuID()}";
+                //한번에 읽어와서 Dataset에 저장
+                try
+                {
+                    MySqlDataAdapter adpt = new MySqlDataAdapter(query, conn);
+                    adpt.Fill(ds, "favorites_list");
+                }
+                catch
+                {
+                    init.Type = (int)LoginResult.OK;
+                }
+
+                //GetMyRegisteredList 에서의 기능
+                query = $"SELECT takes_info.course_id, takes_info.`type`, course_name, credit, instructor_name, time ,lect_room " +
+                $"FROM sugang.`opened_course` INNER JOIN sugang.takes_info " +
+                $"ON opened_course.course_id = takes_info.course_id " +
+                $"WHERE student_id='{user.GetStuID()}' AND YEAR=year(CURDATE()) AND semester=1";
+                //한번에 읽어와서 Dataset에 저장
+                try
+                {
+                    MySqlDataAdapter adpt = new MySqlDataAdapter(query, conn);
+                    adpt.Fill(ds, "registered_list");
+                }
+                catch
+                {
+                    init.Type = (int)LoginResult.OK;
+                }
+                //순번 학정번호 구분 과목명 학점 담당교수 시간 강의실
+                init.ds=DatasetToJson.SerializeToJSON(ds);
+                Console.WriteLine(init.ds);
+                return init;
+            }
+            else return init;
         }
 
         // TESTED : 최초 로그인 시 즐겨찾기 목록 반환 (DB 읽기)
         // 학번
         public static Packet InquireFavorites(IUser user)
         {
-            string query = $"SELECT opened_course.course_id, course_name, credit, instructor_name, time" +
+            string query = $"SELECT idx, opened_course.course_id, course_name, credit, instructor_name, time" +
                $" FROM `opened_course` INNER JOIN `registerd_favorites`" +
                $" ON registerd_favorites.course_id = opened_course.course_id" +
                $" WHERE student_id={user.GetStuID()}";
@@ -76,7 +121,7 @@ namespace Server
             //현재학기 수강신청정보와 개설과목 정보를 JOIN
             //학정번호,이수구분,과목명,학점,교수명,시간,강의실 반환
             //이수구분은 기본적으로 과목에 따라서 분류
-            //전공과목의 경우 -> 개설학과가 신청자 소속과 다르면 일반으로 분류될것임
+            //전공과목의 경우 -> 개설학과가 신청자 소속과 다르면 일반으로 분류하는게 가능은 하지만 여기선 구현x
             string query = $"SELECT takes_info.course_id, takes_info.TYPE, course_name, credit, instructor_name, time ,lect_room " +
                 $"FROM sugang.`opened_course` INNER JOIN sugang.takes_info " +
                 $"ON opened_course.course_id = takes_info.course_id " +
@@ -246,6 +291,8 @@ namespace Server
                 return InquireResult.AlreadyFull;
             }
 
+            Console.WriteLine(DatasetToJson.SerializeToJSON(ds));
+
             string courseName = dataRow["course_name"].ToString();
             string subjectID = dataRow["subject"].ToString();
 
@@ -267,19 +314,19 @@ namespace Server
             if (ds.Tables["before_taken"].Rows.Count != 0)
             {
                 dataRow = ds.Tables["before_taken"].Rows[0];
-                if ( !( (float)dataRow["gpa"] < (float)3.0) || ds.Tables["before_taken"].Rows.Count > 3)
+                if (!((float)dataRow["gpa"] < (float)3.0) || ds.Tables["before_taken"].Rows.Count > 3)
                 {
                     Console.WriteLine("재수강불가");
                     return InquireResult.AlreadyTaken;
                 }
-                
+
                 string beforeYear = dataRow["year"].ToString();
                 string beforeSemester = dataRow["semester"].ToString();
                 string beforeType = dataRow["type"].ToString(); ;
                 string beforeGrade = dataRow["grade"].ToString(); ;
                 string beforeCredit = dataRow["credit"].ToString(); ;
                 string beforeCourseName = dataRow["course_name"].ToString();
-                Console.WriteLine(beforeYear+ beforeSemester + "에들은 " + dataRow["course_name"] +"를 재수강");
+                Console.WriteLine(beforeYear + beforeSemester + "에들은 " + dataRow["course_name"] + "를 재수강");
             }
 
             Console.WriteLine(user.GetStuID() + "가 " + ds.Tables["course_info"].Rows[0]["course_name"] + " 조회");
@@ -313,10 +360,10 @@ namespace Server
 
 
             //지금 신청하려는 과목이 학생의 다른 신청과목과 겹치지는 않는지 확인
-            string studentTime= ds.Tables["student_info"].Rows[0]["registered_times"].ToString();
+            string studentTime = ds.Tables["student_info"].Rows[0]["registered_times"].ToString();
             string courseTime = ds.Tables["course_info"].Rows[0]["time"].ToString();
 
-            Console.WriteLine("학생시간 >> "+studentTime);
+            Console.WriteLine("학생시간 >> " + studentTime);
             Console.WriteLine("과목시간 >> " + courseTime);
 
             string[] courseTimeS = courseTime.Split('.'); // . 으로 신청하려는 과목의 시간들을 Slicing하여 저장
@@ -326,7 +373,7 @@ namespace Server
             {
                 if (str == "미지정") break;
                 if (str == "") continue;
-                if (studentTime.Contains(str)==true)
+                if (studentTime.Contains(str) == true)
                 {
                     Console.WriteLine("시간이 겹칩니다.");
                     return RegisterResult.TimeConflicts;
@@ -377,7 +424,7 @@ namespace Server
             {
                 return First_ProcessResult.Error;
             }
-            Console.WriteLine ("삭제성공");
+            Console.WriteLine("삭제성공");
             return First_ProcessResult.OK;
         }
 

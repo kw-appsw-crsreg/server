@@ -68,7 +68,6 @@ C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Numer
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\yunasin\source\repos\2023AppServer\server\Server\obj\Debug\Server.csproj.CopyComplete
-C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\AppswPacket.dll
 C:\Users\박규태\Source\Repos\serverjjp\Server\bin\Debug\Server.exe.config
 C:\Users\박규태\Source\Repos\serverjjp\Server\bin\Debug\Server.exe
 C:\Users\박규태\Source\Repos\serverjjp\Server\bin\Debug\Server.pdb
@@ -109,3 +108,7 @@ C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\MySqlConnector.dll
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\System.Diagnostics.DiagnosticSource.dll
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\MySqlConnector.xml
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\MySqlConnector.dll
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Diagnostics.DiagnosticSource.dll
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\MySqlConnector.xml
+C:\Users\yunasin\source\repos\2023AppServer\server\Server\bin\Debug\System.Diagnostics.DiagnosticSource.xml

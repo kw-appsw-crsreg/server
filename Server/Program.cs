@@ -41,7 +41,7 @@ namespace Server
                 user tst = new user();
                 tst.SetStuID(studentID); tst.SetCourseID(stuCourseNum);
 
-                QueryProcess.DropCourse(tst);
+                QueryProcess.InquireCourse(tst);
 
                 //From String to byte array
                 /*
@@ -155,13 +155,11 @@ namespace Server
             {
                 case (int)Packet_Type.GoLogin:
                     {
-                        Initialize init = new Initialize();
                         IUser user = new user();
                         user.SetStuID(((Login)packet).stuID);
                         user.SetPwd(((Login)packet).pwd);
-
-                        init.Type = (int)QueryProcess.DBLogin(user); //
-                        return init;
+//
+                        return (Initialize)QueryProcess.DBLogin(user);
                     }
                 case (int)Packet_Type.GoRegister:
                     {
