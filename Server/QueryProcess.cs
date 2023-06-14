@@ -69,7 +69,7 @@ namespace Server
                     init.Type = (int)LoginResult.OK;
                 }
                 //순번 학정번호 구분 과목명 학점 담당교수 시간 강의실
-                init.ds=DatasetToJson.SerializeToJSON(ds);
+                init.ds = DatasetToJson.SerializeToJSON(ds);
                 Console.WriteLine(init.ds);
                 return init;
             }
@@ -271,27 +271,41 @@ namespace Server
 
         // TESTED : 즐겨찾기 및 과목선택 필드 : 과목조회 눌렀을때(from 학정번호직접입력 or from 즐겨찾기) (DB 읽기)
         // 학번, 학정번호
-        public static InquireResult InquireCourse(IUser user)
+        // 조회 시 조회결과(성공여부)와, 해당과목정보 
+        public static Packet InquireCourse(IUser user)
         {
+            inquire inqPacket = new inquire();
             string query = "";
             MySqlDataAdapter adpt;
-            DataSet ds = new DataSet();
+            DataSet ds = new DataSet(); //여기에 과목정보저장
 
             //요청교과목정보 가져오기
             query = $"SELECT * FROM `opened_course` WHERE course_id='{user.GetCourseID()}'";
             adpt = new MySqlDataAdapter(query, conn);
-            try { adpt.Fill(ds, "course_info"); } catch { Console.WriteLine("잘못된학정번호!"); return InquireResult.WrongCourseNumber; }
+            try { adpt.Fill(ds, "course_info"); }
+            catch
+            {
+                Console.WriteLine("잘못된학정번호!");
+                inqPacket.Type = (int)InquireResult.WrongCourseNumber;
+                return inqPacket;
+            }
 
             //만석여부 판단 -> 만석이면 False
             DataRow dataRow;
-            try { dataRow = ds.Tables["course_info"].Rows[0]; } catch { Console.WriteLine("잘못된학정번호!"); return InquireResult.WrongCourseNumber; }
+            try { dataRow = ds.Tables["course_info"].Rows[0]; }
+            catch
+            {
+                Console.WriteLine("잘못된학정번호!");
+                inqPacket.Type = (int)InquireResult.WrongCourseNumber;
+                return inqPacket;
+            }
+            inqPacket.ds = DatasetToJson.SerializeToJSON(ds);
             if (int.Parse(dataRow["remaining_capacity"].ToString()) == 0)
             {
                 Console.WriteLine(ds.Tables["course_info"].Rows[0]["course_name"] + "는 만석!");
-                return InquireResult.AlreadyFull;
+                inqPacket.Type = (int)InquireResult.AlreadyFull;
+                return inqPacket;
             }
-
-            Console.WriteLine(DatasetToJson.SerializeToJSON(ds));
 
             string courseName = dataRow["course_name"].ToString();
             string subjectID = dataRow["subject"].ToString();
@@ -306,7 +320,12 @@ namespace Server
                 $"OR subject IN (SELECT `same_subject` FROM `same_subject` WHERE subject='{subjectID}' ) )" + //동일교과목 지정과목이거나
                 $"ORDER BY `year` desc";//최신순 정렬
             adpt = new MySqlDataAdapter(query, conn);
-            try { adpt.Fill(ds, "before_taken"); } catch { Console.WriteLine("Error!"); }
+            try { adpt.Fill(ds, "before_taken"); }
+            catch { 
+                Console.WriteLine("Error!");
+                inqPacket.Type = (int)InquireResult.Error;
+                return inqPacket;
+            }
 
             //이전수강내역이 있는 경우라면?? =====>> 재수강가능인지 확인
             //이전에 B이상이면 재수강불가 (3.0미만이어야)
@@ -317,9 +336,13 @@ namespace Server
                 if (!((float)dataRow["gpa"] < (float)3.0) || ds.Tables["before_taken"].Rows.Count > 3)
                 {
                     Console.WriteLine("재수강불가");
-                    return InquireResult.AlreadyTaken;
+                    inqPacket.Type = (int)InquireResult.AlreadyTaken;
+                    return inqPacket;
                 }
 
+                inqPacket.ds = DatasetToJson.SerializeToJSON(ds); //재수강정보까지 포함한 ds
+
+                
                 string beforeYear = dataRow["year"].ToString();
                 string beforeSemester = dataRow["semester"].ToString();
                 string beforeType = dataRow["type"].ToString(); ;
@@ -327,10 +350,13 @@ namespace Server
                 string beforeCredit = dataRow["credit"].ToString(); ;
                 string beforeCourseName = dataRow["course_name"].ToString();
                 Console.WriteLine(beforeYear + beforeSemester + "에들은 " + dataRow["course_name"] + "를 재수강");
+                
             }
 
             Console.WriteLine(user.GetStuID() + "가 " + ds.Tables["course_info"].Rows[0]["course_name"] + " 조회");
-            return InquireResult.OK;
+            inqPacket.Type = (int)InquireResult.OK;
+
+            return inqPacket;
         }
 
         // TESTED : 과목선택 필드 : 수강신청 눌렀을때 (DB 쓰기)

@@ -173,13 +173,11 @@ namespace Server
                     }
                 case (int)Packet_Type.GoInquire:
                     {
-                        Initialize init = new Initialize();
                         IUser user = new user();
                         user.SetStuID(((inquire)packet).stuID);
                         user.SetCourseID(((inquire)packet).ci);
 
-                        init.Type = (int)QueryProcess.InquireCourse(user); //
-                        return init;
+                        return (inquire)QueryProcess.InquireCourse(user); //
                     }
                 case (int)Packet_Type.GetFavoirtes:
                     {
