@@ -160,8 +160,7 @@ namespace Server
                         user.SetStuID(((Login)packet).stuID);
                         user.SetPwd(((Login)packet).pwd);
 
-                        init.Type = (int)QueryProcess.DBLogin(user); //
-                        return init;
+                        return (Initialize)QueryProcess.DBLogin(user);
                     }
                 case (int)Packet_Type.GoRegister:
                     {
@@ -180,8 +179,7 @@ namespace Server
                         user.SetStuID(((inquire)packet).stuID);
                         user.SetCourseID(((inquire)packet).ci);
 
-                        init.Type = (int)QueryProcess.InquireCourse(user); //
-                        return init;
+                        return (Initialize)QueryProcess.InquireCourse(user); //
                     }
                 case (int)Packet_Type.GetFavoirtes:
                     {
