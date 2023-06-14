@@ -458,18 +458,17 @@ namespace Server
         // TESTED : 검색 필드 : 과목검색 눌렀을때 (DB 읽기)
         public static Packet SearchCourse(IUser user)
         {
-            string department = ""; //전체검색이라면 비워두세요
-            string courseType = ""; //전체검색이라면 비워두세요
-            string courseName = ""; //전체검색이라면 비워두세요
-            bool isOnlyRemaining = false;
+            string department = user.GetDepartment(); //전체검색이라면 비워두세요
+            string courseType = user.GetCourseType(); //전체검색이라면 비워두세요
+            string courseName = user.GetCourseName(); //전체검색이라면 비워두세요
+            bool isOnlyRemaining = user.GetisOnlyRemaining();
 
             //반환항목 : 학정번호,개설구분,과목명,학점,교수명,여석,개설시간
             string query = $"SELECT course_id, type, course_name, credit, instructor_name, remaining_capacity , time " +
-                 $"FROM `opened_course` " +
-                 $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030
-
-            if (true) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
-            if (true) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
+                 $"FROM `opened_course` "              
+                 + $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
+            if (!String.Equals(user.GetVar(), "")) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
+            if (!String.Equals(courseType, "")) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
             if (isOnlyRemaining) { query = query + " AND remaining_capacity>0 "; } //여석유무에따라
 
             Initialize init = new Initialize();
@@ -481,12 +480,12 @@ namespace Server
             {
                 adpt.Fill(searchResult);
                 init.ds = DatasetToJson.SerializeToJSON(searchResult);
-                init.Type = (int)First_ProcessResult.OK;
+                init.Type = (int)InquireResult.OK;
             }
             catch
             {
                 Console.WriteLine("Error!");
-                init.Type = (int)First_ProcessResult.Error;
+                init.Type = (int)InquireResult.Error;
                 return init;
             }
 

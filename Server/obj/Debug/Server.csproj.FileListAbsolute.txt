@@ -109,3 +109,4 @@ C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\MySqlConnector.dll
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\System.Diagnostics.DiagnosticSource.dll
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\MySqlConnector.xml
 C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\박규태\source\repos\serverjjp\Server\bin\Debug\AppswPacket.pdb

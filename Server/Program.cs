@@ -105,8 +105,8 @@ namespace Server
 
                 while (true)
                 {
-                    byte[] readBuffer = new byte[1024 * 4];
-                    bs = stream.Read(readBuffer, 0, 1024 * 4);
+                    byte[] readBuffer = new byte[1024 * 4000];
+                    bs = stream.Read(readBuffer, 0, 1024 * 4000);
                     packet = (Packet)Packet.Desserialize(readBuffer);
                     stream.Flush();
 
@@ -133,7 +133,7 @@ namespace Server
            
                 //Send to Client
                 Initialize init;
-                byte[] sendBuffer = new byte[1024 * 4];
+                byte[] sendBuffer = new byte[1024 * 4000];
                 init = (Initialize)SQLrst((Packet)packet);
 
                 Packet.Serialize(init).CopyTo(sendBuffer, 0);
@@ -229,7 +229,10 @@ namespace Server
                 case (int)Packet_Type.SearchCouse:
                     {
                         IUser user = new user();
-                        user.SetVar(((Register)packet).var);
+                        user.SetisOnlyRemaining(((inquire)packet).isOnlyRemaining);
+                        user.SetVar(((inquire)packet).var);
+                        user.SetCourseTyoe(((inquire)packet).courseType);
+                        user.SetDepartment(((inquire)packet).department);
 
                         return (Initialize)QueryProcess.SearchCourse(user);
                     }
