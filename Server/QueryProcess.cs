@@ -468,7 +468,7 @@ namespace Server
             //반환항목 : 학정번호,개설구분,과목명,학점,교수명,여석,개설시간
             string query = $"SELECT course_id, `type`, course_name, credit, instructor_name, remaining_capacity , time " +
                  $"FROM `opened_course` "              
-                 + $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
+                 + $"WHERE `year`=year(CURDATE()) AND semester=1 AND department REGEXP '^{department}' ";//현재학기로 한정, 개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
             if (!(String.Equals(user.GetVar(), "")|| String.Equals(user.GetVar(), null))) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
             if (!(String.Equals(courseType, null) || String.Equals(courseType, "") || String.Equals(courseType, "전체검색"))) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
             if (isOnlyRemaining) { query = query + " AND remaining_capacity>0 "; } //여석유무에따라
