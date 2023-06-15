@@ -366,7 +366,7 @@ namespace Server
         {
             DataSet ds = new DataSet();
             //학생정보 가져오기
-            string query = $" SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}' ";
+            string query = $"SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}' ";
             MySqlDataAdapter fori = new MySqlDataAdapter(query, conn);
             fori.Fill(ds, "student_info");
             bool isStudentForeigner = bool.Parse(ds.Tables["student_info"].Rows[0]["is_foreigner"].ToString());

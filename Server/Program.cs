@@ -139,12 +139,6 @@ namespace Server
                 Packet.Serialize(init).CopyTo(sendBuffer, 0);
                 stream.Write(sendBuffer, 0, sendBuffer.Length);
                 stream.Flush();
-
-                for (int i = 0; i < sendBuffer.Length; i++)
-                {
-                    sendBuffer[i] = 0;
-                }
-                stream.Flush();
                 set.Remove((Packet)packet);
             
         }
