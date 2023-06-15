@@ -366,13 +366,13 @@ namespace Server
         {
             DataSet ds = new DataSet();
             //학생정보 가져오기
-            string query = $"SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}' ";
+            string query = $"SELECT is_foreigner, registered_times FROM student_info WHERE student_id='{user.GetStuID()}';";
             MySqlDataAdapter fori = new MySqlDataAdapter(query, conn);
             fori.Fill(ds, "student_info");
             bool isStudentForeigner = bool.Parse(ds.Tables["student_info"].Rows[0]["is_foreigner"].ToString());
 
             //과목정보 가져오기
-            query = $"SELECT is_foreignerOnly, `time` FROM opened_course WHERE course_id='{user.GetCourseID()}' ";
+            query = $"SELECT is_foreignerOnly, `time` FROM opened_course WHERE course_id='{user.GetCourseID()}';";
             fori = new MySqlDataAdapter(query, conn);
             fori.Fill(ds, "course_info");
             bool isCourseForeigner = bool.Parse(ds.Tables["course_info"].Rows[0]["is_foreignerOnly"].ToString());
@@ -436,10 +436,12 @@ namespace Server
 
         // TESTED : 과목선택 필드 : 수강신청 삭제할때 (DB 쓰기)
         // 학번, 학정번호
-        public static First_ProcessResult DropCourse(IUser user)
+        public static RegisterResult DropCourse(IUser user)
         {
             //수강삭제 쿼리
+            Console.WriteLine(user.GetCourseID() + user.GetStuID());
             string query = $"DELETE FROM `sugang`.`takes_info` WHERE  `student_id`='{user.GetStuID()}' AND `course_id`='{user.GetCourseID()}'; ";
+            
             MySqlCommand fav;
             try
             {
@@ -449,10 +451,10 @@ namespace Server
             }
             catch
             {
-                return First_ProcessResult.Error;
+                return RegisterResult.Error;
             }
             Console.WriteLine("삭제성공");
-            return First_ProcessResult.OK;
+            return RegisterResult.OK;
         }
 
         // TESTED : 검색 필드 : 과목검색 눌렀을때 (DB 읽기)
@@ -460,6 +462,7 @@ namespace Server
         {
             string department = user.GetDepartment(); //전체검색이라면 비워두세요
             string courseType = user.GetCourseType(); //전체검색이라면 비워두세요
+            Console.WriteLine(courseType);
             string courseName = user.GetCourseName(); //전체검색이라면 비워두세요
             bool isOnlyRemaining = user.GetisOnlyRemaining();
 

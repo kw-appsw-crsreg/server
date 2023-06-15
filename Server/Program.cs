@@ -145,6 +145,10 @@ namespace Server
 
         static Packet SQLrst(Packet packet)
         {
+            /*
+            * client에서 보낸 패킷 타입에 따라서 해당하는 쿼리 작업을 수행함.
+            * 쿼리 작업이 수행된 후에 나온 결과물을 패킷에 담아서 반환해줌.
+            */
             switch ((int)packet.Type)
             {
                 case (int)Packet_Type.GoLogin:
@@ -163,7 +167,7 @@ namespace Server
                         user.SetStuID(((Register)packet).stuID);
                         user.SetCourseID(((Register)packet).ci);
 
-                        init.Type = (int)QueryProcess.RegisterCourse(user); //
+                        init.Type = (int)QueryProcess.RegisterCourse(user); 
                         return init;
                     }
                 case (int)Packet_Type.GoInquire:
@@ -173,14 +177,14 @@ namespace Server
                         user.SetStuID(((inquire)packet).stuID);
                         user.SetCourseID(((inquire)packet).ci);
 
-                        return (Initialize)QueryProcess.InquireCourse(user); //
+                        return (Initialize)QueryProcess.InquireCourse(user); 
                     }
                 case (int)Packet_Type.GetFavoirtes:
                     {
                         IUser user = new user();
                         user.SetStuID(((inquire)packet).stuID);
 
-                        return (Initialize)QueryProcess.InquireFavorites(user); //
+                        return (Initialize)QueryProcess.InquireFavorites(user); 
                     }
                 case (int)Packet_Type.AddToFavorites:
                     {
@@ -190,7 +194,7 @@ namespace Server
                         user.SetCourseID(((Favorites)packet).ci);
                         user.SetIdx(((Favorites)packet).idx);
 
-                        init.Type = (int)QueryProcess.AddToFavorites(user); //
+                        init.Type = (int)QueryProcess.AddToFavorites(user); 
                         return init;
                     }
                 case (int)Packet_Type.DeleteFromFavorites:
@@ -208,7 +212,7 @@ namespace Server
                         IUser user = new user();
                         user.SetStuID(((Register)packet).stuID);
 
-                        return (Initialize)QueryProcess.GetMyRegisteredList(user); //
+                        return (Initialize)QueryProcess.GetMyRegisteredList(user); 
                     }
                 case (int)Packet_Type.DropCourse:
                     {
@@ -217,7 +221,7 @@ namespace Server
                         user.SetStuID(((Register)packet).stuID);
                         user.SetCourseID(((Register)packet).ci);
 
-                        init.Type = (int)QueryProcess.DropCourse(user); //
+                        init.Type = (int)QueryProcess.DropCourse(user); 
                         return init;
                     }
                 case (int)Packet_Type.SearchCouse:
@@ -232,14 +236,14 @@ namespace Server
                     }
                 case (int)Packet_Type.GetTypes:
                     {
-                        return (Initialize)QueryProcess.GetTypes(); //
+                        return (Initialize)QueryProcess.GetTypes(); 
                     }
                 case (int)Packet_Type.GetDepartments:
                     {
                         IUser user = new user();
                         user.SetStuID(((Initialize)packet).stuID);
 
-                        return (Initialize)QueryProcess.GetDepartments(user); //
+                        return (Initialize)QueryProcess.GetDepartments(user); 
                     }
             }
             return null;
