@@ -54,7 +54,7 @@ namespace Server
                 }
 
                 //GetMyRegisteredList 에서의 기능
-                query = $"SELECT takes_info.course_id, takes_info.`type`, course_name, credit, instructor_name, time ,lect_room " +
+                query = $"SELECT takes_info.course_id, opened_course.`type`, course_name, credit, instructor_name, time ,lect_room " +
                 $"FROM sugang.`opened_course` INNER JOIN sugang.takes_info " +
                 $"ON opened_course.course_id = takes_info.course_id " +
                 $"WHERE student_id='{user.GetStuID()}' AND YEAR=year(CURDATE()) AND semester=1";
@@ -122,7 +122,7 @@ namespace Server
             //학정번호,이수구분,과목명,학점,교수명,시간,강의실 반환
             //이수구분은 기본적으로 과목에 따라서 분류
             //전공과목의 경우 -> 개설학과가 신청자 소속과 다르면 일반으로 분류하는게 가능은 하지만 여기선 구현x
-            string query = $"SELECT takes_info.course_id, takes_info.TYPE, course_name, credit, instructor_name, time ,lect_room " +
+            string query = $"SELECT takes_info.course_id, opened_course.`type`, course_name, credit, instructor_name, time ,lect_room " +
                 $"FROM sugang.`opened_course` INNER JOIN sugang.takes_info " +
                 $"ON opened_course.course_id = takes_info.course_id " +
                 $"WHERE student_id='{user.GetStuID()}' AND YEAR=year(CURDATE()) AND semester=1";
