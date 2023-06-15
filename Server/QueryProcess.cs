@@ -462,7 +462,6 @@ namespace Server
         {
             string department = user.GetDepartment(); //전체검색이라면 비워두세요
             string courseType = user.GetCourseType(); //전체검색이라면 비워두세요
-            Console.WriteLine(courseType);
             string courseName = user.GetCourseName(); //전체검색이라면 비워두세요
             bool isOnlyRemaining = user.GetisOnlyRemaining();
 
@@ -470,8 +469,8 @@ namespace Server
             string query = $"SELECT course_id, type, course_name, credit, instructor_name, remaining_capacity , time " +
                  $"FROM `opened_course` "              
                  + $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
-            if (!String.Equals(user.GetVar(), "")) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
-            if (!String.Equals(courseType, "")) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
+            if (!(String.Equals(user.GetVar(), "")|| String.Equals(user.GetVar(), null))) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
+            if (!(String.Equals(courseType, null) || String.Equals(courseType, ""))) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
             if (isOnlyRemaining) { query = query + " AND remaining_capacity>0 "; } //여석유무에따라
 
             Initialize init = new Initialize();
