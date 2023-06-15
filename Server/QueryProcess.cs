@@ -166,6 +166,7 @@ namespace Server
             try
             {
                 adpt.Fill(ds);
+                ds.Tables[0].Rows.Add("전체검색");
                 init.ds = DatasetToJson.SerializeToJSON(ds);
                 init.Type = (int)First_ProcessResult.OK;
             }
@@ -176,10 +177,7 @@ namespace Server
                 return init;
             }
 
-            foreach (DataRow r in ds.Tables[0].Rows)
-            {
-                Console.WriteLine(r["type"].ToString());
-            }
+            Console.WriteLine("GetTypes 호출");
 
             return init;
         }
@@ -243,7 +241,7 @@ namespace Server
             try
             {
                 query = $"INSERT INTO `sugang`.`registerd_favorites` (`student_id`, `idx`, `course_id`)" +
-                    $"VALUES ('{user.GetStuID()}', {user.GetIdx()}, {user.GetCourseID()})";
+                    $"VALUES ('{user.GetStuID()}', {user.GetIdx()}, '{user.GetCourseID()}');";
                 fav = new MySqlCommand(query, conn);
                 fav.ExecuteNonQuery();
                 return FavoritesResult.OK;
@@ -472,7 +470,7 @@ namespace Server
                  $"FROM `opened_course` "              
                  + $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
             if (!(String.Equals(user.GetVar(), "")|| String.Equals(user.GetVar(), null))) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
-            if (!(String.Equals(courseType, null) || String.Equals(courseType, ""))) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
+            if (!(String.Equals(courseType, null) || String.Equals(courseType, "") || String.Equals(courseType, "전체검색"))) { query = query + $" AND `type`='{courseType}' "; } //이수구분별
             if (isOnlyRemaining) { query = query + " AND remaining_capacity>0 "; } //여석유무에따라
 
             Initialize init = new Initialize();
