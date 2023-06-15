@@ -221,7 +221,8 @@ namespace Server
         {
             MySqlCommand fav;
             string query = $"";
-            // 이미 그 번호에 다른 과목이 있진 않은 지 확인
+            // 이미 그 번호에 다른 과목이 있진 않은 지 확인 -> db무결성검증로직으로 해결
+            /*
             try
             {
                 // Console.WriteLine($"REQ : {stuID} {ci} {idx}");
@@ -236,6 +237,7 @@ namespace Server
             {
                 return FavoritesResult.AlreadyExist;
             }
+            */
 
             //즐겨찾기에 최종 추가
             try
