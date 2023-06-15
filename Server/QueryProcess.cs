@@ -41,7 +41,7 @@ namespace Server
                 query = $"SELECT idx, opened_course.course_id, course_name, credit, instructor_name, `time`" +
                $" FROM `opened_course` INNER JOIN `registerd_favorites`" +
                $" ON registerd_favorites.course_id = opened_course.course_id" +
-               $" WHERE student_id={user.GetStuID()}";
+               $" WHERE student_id='{user.GetStuID()}'";
                 //한번에 읽어와서 Dataset에 저장
                 try
                 {
@@ -83,7 +83,7 @@ namespace Server
             string query = $"SELECT idx, opened_course.course_id, course_name, credit, instructor_name, time" +
                $" FROM `opened_course` INNER JOIN `registerd_favorites`" +
                $" ON registerd_favorites.course_id = opened_course.course_id" +
-               $" WHERE student_id={user.GetStuID()}";
+               $" WHERE student_id='{user.GetStuID()}';";
 
             DataSet ds = new DataSet();
             MySqlDataAdapter adpt = new MySqlDataAdapter(query, conn);
@@ -125,7 +125,7 @@ namespace Server
             string query = $"SELECT takes_info.course_id, opened_course.`type`, course_name, credit, instructor_name, time ,lect_room " +
                 $"FROM sugang.`opened_course` INNER JOIN sugang.takes_info " +
                 $"ON opened_course.course_id = takes_info.course_id " +
-                $"WHERE student_id='{user.GetStuID()}' AND YEAR=year(CURDATE()) AND semester=1";
+                $"WHERE student_id='{user.GetStuID()}' AND YEAR=year(CURDATE()) AND semester=1;";
 
             Initialize init = new Initialize();
             DataSet ds = new DataSet();
@@ -156,7 +156,7 @@ namespace Server
         // TESTED : 최초 로그인 시 과목 이수구분들 뭐뭐있는지  반환 (DB 읽기) : TESTED
         public static Packet GetTypes()
         {
-            string query = "SELECT DISTINCT `type` FROM opened_course ORDER BY `type` ASC";
+            string query = "SELECT DISTINCT `type` FROM opened_course ORDER BY `type` ASC;";
 
             Initialize init = new Initialize();
             DataSet ds = new DataSet();
@@ -186,7 +186,7 @@ namespace Server
         // 학번
         public static Packet GetDepartments(IUser user)
         {
-            string query = $"SELECT department_str FROM `student_info` WHERE `student_id`={user.GetStuID()}";
+            string query = $"SELECT department_str FROM `student_info` WHERE `student_id`='{user.GetStuID()}';";
             Initialize init = new Initialize();
             DataSet ds = new DataSet();
             MySqlDataAdapter adpt = new MySqlDataAdapter(query, conn);
@@ -258,7 +258,7 @@ namespace Server
             try
             {
                 //즐겨찾기에서 삭제
-                query = $"DELETE FROM `sugang`.`registerd_favorites` WHERE student_id={user.GetStuID()} AND idx={user.GetIdx()}";
+                query = $"DELETE FROM `sugang`.`registerd_favorites` WHERE student_id='{user.GetStuID()}' AND idx={user.GetIdx()}";
                 fav = new MySqlCommand(query, conn);
                 fav.ExecuteNonQuery();
             }
@@ -280,7 +280,7 @@ namespace Server
             DataSet ds = new DataSet(); //여기에 과목정보저장
 
             //요청교과목정보 가져오기
-            query = $"SELECT * FROM `opened_course` WHERE course_id='{user.GetCourseID()}'";
+            query = $"SELECT * FROM `opened_course` WHERE course_id='{user.GetCourseID()}';";
             adpt = new MySqlDataAdapter(query, conn);
             try { adpt.Fill(ds, "course_info"); }
             catch
@@ -318,7 +318,7 @@ namespace Server
                 $"WHERE student_id='{user.GetStuID()}' AND (YEAR!=year(CURDATE()) OR semester!=1) " + //이전학기 수강으로 한정
                 $"AND(course_name='{courseName}' OR subject='{subjectID}' " +//과목명이 똑같거나 과목코드가 똑같거나
                 $"OR subject IN (SELECT `same_subject` FROM `same_subject` WHERE subject='{subjectID}' ) )" + //동일교과목 지정과목이거나
-                $"ORDER BY `year` desc";//최신순 정렬
+                $"ORDER BY `year` desc;";//최신순 정렬
             adpt = new MySqlDataAdapter(query, conn);
             try { adpt.Fill(ds, "before_taken"); }
             catch
@@ -466,7 +466,7 @@ namespace Server
             bool isOnlyRemaining = user.GetisOnlyRemaining();
 
             //반환항목 : 학정번호,개설구분,과목명,학점,교수명,여석,개설시간
-            string query = $"SELECT course_id, type, course_name, credit, instructor_name, remaining_capacity , time " +
+            string query = $"SELECT course_id, `type`, course_name, credit, instructor_name, remaining_capacity , time " +
                  $"FROM `opened_course` "              
                  + $"WHERE department REGEXP '^{department}' ";//개설학과 또는 개설단과대별 - 예) 소융대전체라면 H, 소융대공통이라면 H000, 소융대+소프트학부라면 H030}
             if (!(String.Equals(user.GetVar(), "")|| String.Equals(user.GetVar(), null))) { query = query + $" AND course_name REGEXP '{user.GetVar()}+' "; } //과목명
